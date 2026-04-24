@@ -552,28 +552,33 @@ function App(){
   }
 
   function saveDrawing(){
+    setDialog({type:"savechoice"});
+  }
+  function doSaveFile(){
     const data={paths,ksList,activeKS,unit,titleBlock,version:2};
     const json=JSON.stringify(data,null,2);
-    const asFile=confirm("Als Datei herunterladen?\n\nOK = Datei speichern (Downloads/Cloud/USB)\nAbbrechen = Auf Gerät speichern (schnell)");
-    if(asFile){
-      try{
-        const proj=(titleBlock.projekt||"zeichnung").replace(/[^a-zA-Z0-9äöüÄÖÜ_-]/g,"_");
-        const d=new Date();
-        const ts=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
-        const blob=new Blob([json],{type:"application/json"});
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement("a");
-        a.href=url; a.download=proj+"_"+ts+".json";
-        document.body.appendChild(a); a.click();
-        document.body.removeChild(a);
-        setTimeout(function(){URL.revokeObjectURL(url);},1000);
-      }catch(e){ alert("Fehler: "+e.message); }
-    } else {
-      try{
-        localStorage.setItem("easyplan_save",json);
-        alert("✔ Auf Gerät gespeichert!");
-      }catch(e){ alert("Fehler beim Speichern: "+e.message); }
-    }
+    try{
+      const proj=(titleBlock.projekt||"zeichnung").replace(/[^a-zA-Z0-9äöüÄÖÜ_-]/g,"_");
+      const d=new Date();
+      const ts=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+      const blob=new Blob([json],{type:"application/json"});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.href=url; a.download=proj+"_"+ts+".json";
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url);},1000);
+      setDialog(null);
+    }catch(e){ alert("Fehler: "+e.message); }
+  }
+  function doSaveBrowser(){
+    const data={paths,ksList,activeKS,unit,titleBlock,version:2};
+    const json=JSON.stringify(data,null,2);
+    try{
+      localStorage.setItem("easyplan_save",json);
+      setDialog(null);
+      alert("✔ Im Browser gespeichert!");
+    }catch(e){ alert("Fehler beim Speichern: "+e.message); }
   }
 
   function loadDrawing(e){
@@ -597,27 +602,29 @@ function App(){
   }
 
   function loadFromDevice(){
-    const fromFile=confirm("Datei auswählen?\n\nOK = Datei vom Gerät wählen (Downloads/Cloud/USB)\nAbbrechen = Vom Browser laden");
-    if(fromFile){
-      const inp=document.createElement("input");
-      inp.type="file"; inp.accept=".json,application/json";
-      inp.onchange=loadDrawing;
-      inp.click();
-    } else {
-      try{
-        const raw=localStorage.getItem("easyplan_save");
-        if(!raw) return alert("Keine gespeicherte Zeichnung gefunden.");
-        const data=JSON.parse(raw);
-        pushHist();
-        if(data.paths)   setPaths(data.paths);
-        if(data.ksList)  setKsList(data.ksList);
-        if(data.activeKS)setActiveKS(data.activeKS);
-        if(data.unit)    setUnit(data.unit);
-        if(data.titleBlock) setTitleBlock(data.titleBlock);
-        setDraft(null);setSel(null);setDialog(null);setEditMode(false);
-        alert("✔ Zeichnung geladen!");
-      }catch(e){ alert("Fehler: "+e.message); }
-    }
+    setDialog({type:"loadchoice"});
+  }
+  function doLoadFile(){
+    setDialog(null);
+    const inp=document.createElement("input");
+    inp.type="file"; inp.accept="*/*";
+    inp.onchange=loadDrawing;
+    inp.click();
+  }
+  function doLoadBrowser(){
+    try{
+      const raw=localStorage.getItem("easyplan_save");
+      if(!raw) { setDialog(null); return alert("Keine gespeicherte Zeichnung gefunden."); }
+      const data=JSON.parse(raw);
+      pushHist();
+      if(data.paths)   setPaths(data.paths);
+      if(data.ksList)  setKsList(data.ksList);
+      if(data.activeKS)setActiveKS(data.activeKS);
+      if(data.unit)    setUnit(data.unit);
+      if(data.titleBlock) setTitleBlock(data.titleBlock);
+      setDraft(null);setSel(null);setDialog(null);setEditMode(false);
+      alert("✔ Zeichnung geladen!");
+    }catch(e){ alert("Fehler: "+e.message); }
   }
 
   function exportPDF(){
@@ -1237,6 +1244,36 @@ function App(){
       )
 
       /* ═══ DIALOGS ═══ */
+
+      /* Speichern-Dialog */
+      , _optionalChain([dialog, 'optionalAccess', _ss => _ss.type])==="savechoice"&&(
+        React.createElement('div', { style: {position:"fixed",inset:0,background:"#00000060",display:"flex",alignItems:"center",justifyContent:"center",zIndex:500}}
+          , React.createElement('div', { style: {background:"#fff",borderRadius:18,padding:22,width:360,boxShadow:"0 20px 60px #0003",border:`1px solid ${C.border}`}}
+            , React.createElement('div', { style: {fontSize:18,fontWeight:900,color:C.dark,marginBottom:6}}, "💾 Zeichnung speichern")
+            , React.createElement('div', { style: {fontSize:13,color:C.mid,marginBottom:18}}, "Wo möchtest du die Zeichnung speichern?")
+            , React.createElement('button', { onClick: doSaveFile, style: {width:"100%",padding:"14px 16px",borderRadius:10,background:"#eff6ff",color:"#1d4ed8",border:"2px solid #93c5fd",fontSize:15,fontWeight:800,cursor:"pointer",marginBottom:4,textAlign:"left"}}, "📁 Als Datei speichern")
+            , React.createElement('div', { style: {fontSize:11,color:C.mid,marginBottom:12,paddingLeft:14}}, "Downloads / Cloud / USB – bleibt erhalten")
+            , React.createElement('button', { onClick: doSaveBrowser, style: {width:"100%",padding:"14px 16px",borderRadius:10,background:"#f0fdf4",color:"#166534",border:"2px solid #86efac",fontSize:15,fontWeight:800,cursor:"pointer",marginBottom:4,textAlign:"left"}}, "📱 Im Browser speichern")
+            , React.createElement('div', { style: {fontSize:11,color:C.mid,marginBottom:16,paddingLeft:14}}, "Schnell, nur auf diesem Gerät")
+            , React.createElement('button', { onClick: ()=>setDialog(null), style: {width:"100%",padding:"12px 0",borderRadius:10,background:"#f1f5f9",color:C.dark,border:`2px solid ${C.border}`,fontSize:14,fontWeight:600,cursor:"pointer"}}, "✖ Abbrechen")
+          )
+        )
+      )
+
+      /* Laden-Dialog */
+      , _optionalChain([dialog, 'optionalAccess', _ll => _ll.type])==="loadchoice"&&(
+        React.createElement('div', { style: {position:"fixed",inset:0,background:"#00000060",display:"flex",alignItems:"center",justifyContent:"center",zIndex:500}}
+          , React.createElement('div', { style: {background:"#fff",borderRadius:18,padding:22,width:360,boxShadow:"0 20px 60px #0003",border:`1px solid ${C.border}`}}
+            , React.createElement('div', { style: {fontSize:18,fontWeight:900,color:C.dark,marginBottom:6}}, "📂 Zeichnung laden")
+            , React.createElement('div', { style: {fontSize:13,color:C.mid,marginBottom:18}}, "Woher möchtest du die Zeichnung laden?")
+            , React.createElement('button', { onClick: doLoadFile, style: {width:"100%",padding:"14px 16px",borderRadius:10,background:"#eff6ff",color:"#1d4ed8",border:"2px solid #93c5fd",fontSize:15,fontWeight:800,cursor:"pointer",marginBottom:4,textAlign:"left"}}, "📁 Datei auswählen")
+            , React.createElement('div', { style: {fontSize:11,color:C.mid,marginBottom:12,paddingLeft:14}}, "Downloads / Cloud / USB")
+            , React.createElement('button', { onClick: doLoadBrowser, style: {width:"100%",padding:"14px 16px",borderRadius:10,background:"#f0fdf4",color:"#166534",border:"2px solid #86efac",fontSize:15,fontWeight:800,cursor:"pointer",marginBottom:4,textAlign:"left"}}, "📱 Aus Browser laden")
+            , React.createElement('div', { style: {fontSize:11,color:C.mid,marginBottom:16,paddingLeft:14}}, "Zuletzt auf diesem Gerät gespeichert")
+            , React.createElement('button', { onClick: ()=>setDialog(null), style: {width:"100%",padding:"12px 0",borderRadius:10,background:"#f1f5f9",color:C.dark,border:`2px solid ${C.border}`,fontSize:14,fontWeight:600,cursor:"pointer"}}, "✖ Abbrechen")
+          )
+        )
+      )
 
       /* Loch/Ausbruch einfügen (Klick in Fläche) */
       , _optionalChain([dialog, 'optionalAccess', _7 => _7.type])==="holemenu"&&(
