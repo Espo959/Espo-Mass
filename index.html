@@ -964,7 +964,7 @@ function App(){
 
   // ── RENDER ────────────────────────────────────────────────
   return(
-    React.createElement('div', { style: {display:"flex",flexDirection:"column",height:"100vh",maxHeight:"100vh",paddingBottom:"58px",fontFamily:"system-ui,sans-serif",userSelect:"none",overflow:"hidden",boxSizing:"border-box"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 906}}
+    React.createElement('div', { style: {display:"flex",flexDirection:"column",height:"100vh",maxHeight:"100vh",paddingBottom:"102px",fontFamily:"system-ui,sans-serif",userSelect:"none",overflow:"hidden",boxSizing:"border-box"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 906}}
       , React.createElement('style', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 907}}, btnPressStyle)
 
       /* Header */
@@ -1155,7 +1155,7 @@ function App(){
         )
 
         /* Panel */
-        , React.createElement('div', { style: {display:showPanel?"flex":"none",width:180,background:C.panel,borderLeft:`1px solid ${C.border}`,padding:8,flexDirection:"column",gap:5,overflowY:"auto",flexShrink:0,height:"100%",WebkitOverflowScrolling:"touch",touchAction:"pan-y"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1095}}
+        , React.createElement('div', { style: {display:showPanel?"flex":"none",width:180,background:C.panel,borderLeft:`1px solid ${C.border}`,padding:10,flexDirection:"column",gap:8,overflowY:"auto",flexShrink:0,height:"100%"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1095}}
           , React.createElement('div', { style: {background:col+"14",border:`2px solid ${col}`,borderRadius:6,padding:6}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1096}}
             , React.createElement('div', { style: {fontSize:10,color:C.mid,fontWeight:700,marginBottom:4}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1097}}, "AKTIVES KS" )
             , React.createElement('div', { style: {fontSize:16,fontWeight:900,color:col}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1098}}, "KS " , ksIdx)
@@ -1196,32 +1196,6 @@ function App(){
             }))
           )
 
-          , React.createElement('div', { style: {flex:1}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1136}})
-          , [
-            ["Letzten löschen",deleteLast,"#fff7ed","#92400e","#fdba74"],
-            ["↩ Rückgängig",undo,"#eff6ff","#1d4ed8","#93c5fd"],
-            ["Ansicht reset",()=>{setZoom(1.6);setPan({x:280,y:300});},"#f1f5f9",C.dark,C.border],
-            ["Alles löschen",clearAll,"#fef2f2","#dc2626","#fca5a5"],
-          ].map(([lbl,fn,bg,fg,bdr])=>(
-            React.createElement('button', { key: lbl, onClick: fn, style: {padding:"5px 0",borderRadius:6,background:bg,color:fg,border:`1.5px solid ${bdr}`,fontSize:11,cursor:"pointer",fontWeight:700}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1143}}, lbl)
-          ))
-          /* Speichern / Laden */
-          , React.createElement('button', { onClick: saveDrawing,
-            style: {padding:"5px 0",borderRadius:6,background:"#eff6ff",color:"#1d4ed8",border:"1.5px solid #93c5fd",fontSize:11,cursor:"pointer",fontWeight:800}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1146}}, "💾 Speichern"
-
-          )
-          , React.createElement('button', { onClick: loadFromDevice,
-            style: {padding:"5px 0",borderRadius:6,background:"#f0fdf4",color:"#166534",border:"1.5px solid #86efac",fontSize:11,cursor:"pointer",fontWeight:800}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1150}}, "📂 Laden"
-
-          )
-          , React.createElement('button', { onClick: exportPDF,
-            style: {padding:"5px 0",borderRadius:6,background:"#fef2f2",color:"#dc2626",border:"1.5px solid #fca5a5",fontSize:11,cursor:"pointer",fontWeight:800}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1154}}, "🖨 PDF"
-
-          )
-          , React.createElement('button', { onClick: exportDXF,
-            style: {padding:"5px 0",borderRadius:6,background:"#f5f3ff",color:"#7c3aed",border:"1.5px solid #c4b5fd",fontSize:11,cursor:"pointer",fontWeight:800}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1158}}, "📐 DXF"
-
-          )
         )
       )
 
@@ -1230,6 +1204,22 @@ function App(){
         , React.createElement('span', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 1167}}, "Werkzeug: " , React.createElement('b', { style: {color:col}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1167}}, editMode?"✏️ Bearbeitung":_optionalChain([toolDefs, 'access', _4 => _4.find, 'call', _5 => _5(t=>t.id===tool), 'optionalAccess', _6 => _6.label])))
         , React.createElement('span', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 1168}}, "KS", ksIdx, ": " , React.createElement('b', { style: {color:col}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1168}}, fmtXY(curKS.x,curKS.y), uLabel()))
         , React.createElement('span', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 1169}}, "Undo: " , histRef.current.length)
+      )
+
+      /* Button-Leiste - FIXED über dem Schriftfeld */
+      , React.createElement('div', { style: {position:"fixed",bottom:58,left:0,right:0,background:"#f8fafc",borderTop:`1px solid ${C.border}`,padding:"5px 8px",display:"flex",gap:5,alignItems:"center",overflowX:"auto",overflowY:"hidden",height:44,minHeight:44,maxHeight:44,boxSizing:"border-box",zIndex:99}},
+        [
+          ["Letzten löschen",deleteLast,"#fff7ed","#92400e","#fdba74"],
+          ["↩ Rückgängig",undo,"#eff6ff","#1d4ed8","#93c5fd"],
+          ["Ansicht reset",()=>{setZoom(1.6);setPan({x:280,y:300});},"#f1f5f9",C.dark,C.border],
+          ["Alles löschen",clearAll,"#fef2f2","#dc2626","#fca5a5"],
+          ["💾 Speichern",saveDrawing,"#eff6ff","#1d4ed8","#93c5fd"],
+          ["📂 Laden",loadFromDevice,"#f0fdf4","#166534","#86efac"],
+          ["🖨 PDF",exportPDF,"#fef2f2","#dc2626","#fca5a5"],
+          ["📐 DXF",exportDXF,"#f5f3ff","#7c3aed","#c4b5fd"]
+        ].map(function(b){
+          return React.createElement('button', { key:b[0], onClick:b[1], style:{padding:"7px 12px",borderRadius:6,background:b[2],color:b[3],border:"1.5px solid "+b[4],fontSize:13,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}, b[0]);
+        })
       )
 
       /* Schriftfeld (Kopfplan) - FIXED am unteren Rand */
