@@ -1155,8 +1155,8 @@ function App(){
         )
 
         /* Panel */
-        , React.createElement('div', { style: {display:showPanel?"flex":"none",width:180,background:C.panel,borderLeft:`1px solid ${C.border}`,padding:10,flexDirection:"column",gap:8,overflowY:"auto",flexShrink:0,height:"100%",WebkitOverflowScrolling:"touch",touchAction:"pan-y"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1095}}
-          , React.createElement('div', { style: {background:col+"14",border:`2px solid ${col}`,borderRadius:8,padding:10}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1096}}
+        , React.createElement('div', { style: {display:showPanel?"flex":"none",width:180,background:C.panel,borderLeft:`1px solid ${C.border}`,padding:8,flexDirection:"column",gap:5,overflowY:"auto",flexShrink:0,height:"100%",WebkitOverflowScrolling:"touch",touchAction:"pan-y"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1095}}
+          , React.createElement('div', { style: {background:col+"14",border:`2px solid ${col}`,borderRadius:6,padding:6}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1096}}
             , React.createElement('div', { style: {fontSize:10,color:C.mid,fontWeight:700,marginBottom:4}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1097}}, "AKTIVES KS" )
             , React.createElement('div', { style: {fontSize:16,fontWeight:900,color:col}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1098}}, "KS " , ksIdx)
             , React.createElement('div', { style: {fontSize:11,color:C.mid,marginTop:2}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1099}}, "Ursprung: " , React.createElement('b', { style: {color:C.dark}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1099}}, fmtXY(ksobj.x,ksobj.y), uLabel()))
@@ -1203,23 +1203,23 @@ function App(){
             ["Ansicht reset",()=>{setZoom(1.6);setPan({x:280,y:300});},"#f1f5f9",C.dark,C.border],
             ["Alles löschen",clearAll,"#fef2f2","#dc2626","#fca5a5"],
           ].map(([lbl,fn,bg,fg,bdr])=>(
-            React.createElement('button', { key: lbl, onClick: fn, style: {padding:"8px 0",borderRadius:7,background:bg,color:fg,border:`1.5px solid ${bdr}`,fontSize:12,cursor:"pointer",fontWeight:700}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1143}}, lbl)
+            React.createElement('button', { key: lbl, onClick: fn, style: {padding:"5px 0",borderRadius:6,background:bg,color:fg,border:`1.5px solid ${bdr}`,fontSize:11,cursor:"pointer",fontWeight:700}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1143}}, lbl)
           ))
           /* Speichern / Laden */
           , React.createElement('button', { onClick: saveDrawing,
-            style: {padding:"9px 0",borderRadius:7,background:"#eff6ff",color:"#1d4ed8",border:"1.5px solid #93c5fd",fontSize:13,cursor:"pointer",fontWeight:800}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1146}}, "💾 Auf Gerät speichern"
+            style: {padding:"5px 0",borderRadius:6,background:"#eff6ff",color:"#1d4ed8",border:"1.5px solid #93c5fd",fontSize:11,cursor:"pointer",fontWeight:800}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1146}}, "💾 Speichern"
 
           )
           , React.createElement('button', { onClick: loadFromDevice,
-            style: {padding:"9px 0",borderRadius:7,background:"#f0fdf4",color:"#166534",border:"1.5px solid #86efac",fontSize:13,cursor:"pointer",fontWeight:800}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1150}}, "📂 Vom Gerät laden"
+            style: {padding:"5px 0",borderRadius:6,background:"#f0fdf4",color:"#166534",border:"1.5px solid #86efac",fontSize:11,cursor:"pointer",fontWeight:800}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1150}}, "📂 Laden"
 
           )
           , React.createElement('button', { onClick: exportPDF,
-            style: {padding:"9px 0",borderRadius:7,background:"#fef2f2",color:"#dc2626",border:"1.5px solid #fca5a5",fontSize:12,cursor:"pointer",fontWeight:800}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1154}}, "🖨 PDF Export"
+            style: {padding:"5px 0",borderRadius:6,background:"#fef2f2",color:"#dc2626",border:"1.5px solid #fca5a5",fontSize:11,cursor:"pointer",fontWeight:800}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1154}}, "🖨 PDF"
 
           )
           , React.createElement('button', { onClick: exportDXF,
-            style: {padding:"9px 0",borderRadius:7,background:"#f5f3ff",color:"#7c3aed",border:"1.5px solid #c4b5fd",fontSize:12,cursor:"pointer",fontWeight:800}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1158}}, "📐 DXF Export"
+            style: {padding:"5px 0",borderRadius:6,background:"#f5f3ff",color:"#7c3aed",border:"1.5px solid #c4b5fd",fontSize:11,cursor:"pointer",fontWeight:800}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1158}}, "📐 DXF"
 
           )
         )
