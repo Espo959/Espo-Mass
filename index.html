@@ -652,7 +652,7 @@ function App(){
         '<div style="flex:2"><div class="lbl">Projekt</div><div class="val">'+esc(tb.projekt)+'</div></div>'+
         '<div style="flex:1.2"><div class="lbl">Zeichnung-Nr.</div><div class="val">'+esc(tb.zeichnungsnr)+'</div></div>'+
         '<div><div class="lbl">Datum</div><div class="val">'+esc(tb.datum)+'</div></div>'+
-        '<div style="flex:0.8"><div class="lbl">Maßstab</div><div class="val">'+esc(tb.massstab)+'</div></div>'+
+        '<div style="flex:0.8"><div class="lbl">Massstab</div><div class="val">'+esc(tb.massstab)+'</div></div>'+
         '<div style="flex:1.2"><div class="lbl">Name</div><div class="val">'+esc(tb.name)+'</div></div>'+
         '<div style="flex:1.5"><div class="lbl">Firma</div><div class="val">'+esc(tb.firma)+'</div></div>'+
         '<div style="flex:2.5"><div class="lbl">Bemerkungen</div><div class="val">'+esc(tb.bemerkungen)+'</div></div>'+
@@ -771,7 +771,7 @@ function App(){
     return els;
   }
 
-  // Maßlinien für Loch/Ausbruch: KS → Kante, Kante → Mitte, Zeichnungskante → Anfang
+  // Masslinien für Loch/Ausbruch: KS → Kante, Kante → Mitte, Zeichnungskante → Anfang
   function holeDimLines(hole, ks, pathPts){
     const sk = w2s(ks.x, ks.y, pan, zoom);
     const col = "#ef4444";
@@ -997,7 +997,7 @@ function App(){
 
         )
         , React.createElement('button', { onClick: ()=>setShowDim(d=>!d),
-          style: {padding:"8px 14px",borderRadius:7,border:`2px solid ${showDim?"#0891b2":C.border}`,background:showDim?"#0891b2":C.btn,color:showDim?"#fff":C.btnFg,fontWeight:700,fontSize:13,cursor:"pointer"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 930}}, "📐 Maß"
+          style: {padding:"8px 14px",borderRadius:7,border:`2px solid ${showDim?"#0891b2":C.border}`,background:showDim?"#0891b2":C.btn,color:showDim?"#fff":C.btnFg,fontWeight:700,fontSize:13,cursor:"pointer"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 930}}, "📐 Mass"
 
         )
 
@@ -1089,7 +1089,7 @@ function App(){
                   const hd=holeD(hole,pan,zoom);
                   return(React.createElement('g', { key: hole.id, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1020}}
                     , React.createElement('path', { d: hd, fill: "none", stroke: "#ef4444", strokeWidth: 2, strokeDasharray: "7,3", strokeLinejoin: "round", __self: this, __source: {fileName: _jsxFileName, lineNumber: 1021}})
-                    /* Maßkette KS→Kante→Mitte – immer sichtbar */
+                    /* Masskette KS→Kante→Mitte – immer sichtbar */
                     , ksIdx>1 && holeDimLines(hole, ksobj, pts)
                     /* Hole edit handle */
                     , editMode&&(()=>{
@@ -1231,7 +1231,7 @@ function App(){
 
       /* Schriftfeld (Kopfplan) - FIXED am unteren Rand */
       , React.createElement('div', { style: {position:"fixed",bottom:0,left:0,right:0,background:"#fff",borderTop:"2px solid "+C.dark,padding:"6px 8px",display:"flex",gap:4,alignItems:"stretch",overflowX:"auto",overflowY:"hidden",height:58,minHeight:58,maxHeight:58,boxSizing:"border-box",zIndex:100,boxShadow:"0 -2px 8px rgba(0,0,0,0.1)"}},
-        [["Projekt","projekt",160],["Zeichnung-Nr.","zeichnungsnr",120],["Datum","datum",100],["Maßstab","massstab",80],["Name","name",120],["Firma","firma",140],["Bemerkungen","bemerkungen",200]].map(function(f){
+        [["Projekt","projekt",160],["Zeichnung-Nr.","zeichnungsnr",120],["Datum","datum",100],["Massstab","massstab",80],["Name","name",120],["Firma","firma",140],["Bemerkungen","bemerkungen",200]].map(function(f){
           return React.createElement('div', { key:f[1], style:{width:f[2],flexShrink:0,display:"flex",flexDirection:"column",border:"1px solid "+C.border,borderRadius:5,padding:"3px 6px",background:"#fafbfc"}},
             React.createElement('label', { style:{fontSize:9,color:C.mid,fontWeight:700,letterSpacing:0.5,textTransform:"uppercase"}}, f[0]),
             React.createElement('input', {
