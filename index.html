@@ -143,6 +143,8 @@ function App(){
   const [showDim,setShowDim]=useState(true);
   const [showPanel,setShowPanel]=useState(true);
   const [ortho,setOrtho]=useState(true);
+  const [lenInput,setLenInput]=useState("");
+  const [lenDir,setLenDir]=useState("right"); // right, left, up, down
   const [unit,setUnit]=useState("mm"); // "mm" | "cm" | "m"
   const [ksList,setKsList]=useState([{id:1,x:0,y:0}]);
   const [activeKS,setActiveKS]=useState(1);
@@ -319,7 +321,7 @@ function App(){
           if(Math.hypot(sx-s.x,sy-s.y)<22)return;
         }
       }
-      // Segment antippen → Schnitt
+      // Segment antippen → Länge ändern
       for(const path of pathsRef.current){
         const n=path.closed?path.pts.length:path.pts.length-1;
         for(let i=0;i<n;i++){
@@ -329,6 +331,7 @@ function App(){
           if(len2===0)continue;
           const t=Math.max(0,Math.min(1,((sx-sa.x)*dx+(sy-sa.y)*dy)/len2));
           if(Math.hypot(sx-(sa.x+t*dx),sy-(sa.y+t*dy))<22){
+            setDialog({type:"editlen",pathId:path.id,segIdx:i,len:mmLen(a,b),newLen:mmLen(a,b)});
             return;
           }
         }
@@ -401,10 +404,51 @@ function App(){
     }
   };
 
+  function applyNewLength(){
+    if(!dialog||dialog.type!=="editlen")return;
+    const newLen=parseFloat(String(dialog.newLen).replace(",","."));
+    if(isNaN(newLen)||newLen<=0)return;
+    pushHist();
+    setPaths(ps=>ps.map(p=>{
+      if(p.id!==dialog.pathId)return p;
+      const a=p.pts[dialog.segIdx];
+      const b=p.pts[(dialog.segIdx+1)%p.pts.length];
+      const dx=b.x-a.x,dy=b.y-a.y;
+      const oldLen=Math.hypot(dx,dy);
+      if(oldLen<0.001)return p;
+      const factor=newLen/oldLen;
+      const nbx=a.x+dx*factor,nby=a.y+dy*factor;
+      const shiftX=nbx-b.x,shiftY=nby-b.y;
+      // Verschiebe b und alle Punkte nach b mit
+      const newPts=p.pts.map((pt,i)=>{
+        if(i===(dialog.segIdx+1)%p.pts.length)return{...pt,x:nbx,y:nby};
+        if(i>dialog.segIdx+1&&i<p.pts.length)return{...pt,x:pt.x+shiftX,y:pt.y+shiftY};
+        return pt;
+      });
+      return{...p,pts:newPts};
+    }));
+    setDialog(null);
+  }
+
   function finishDraft(closed){
     if(!draft||draft.pts.length<2){setDraft(null);return;}
     pushHist();setPaths(p=>[...p,{id:uid(),pts:draft.pts,closed,holes:[]}]);
-    setDraft(null);setTool("select");
+    setDraft(null);setTool("select");setLenInput("");
+  }
+
+  function addPointByLength(){
+    if(!draft||!draft.pts.length)return;
+    const len=parseFloat(lenInput.replace(",","."));
+    if(isNaN(len)||len<=0)return;
+    const lenMM=unit==="cm"?len*10:unit==="m"?len*1000:len;
+    const prev=draft.pts[draft.pts.length-1];
+    let nx=prev.x,ny=prev.y;
+    if(lenDir==="right")nx=prev.x+lenMM;
+    else if(lenDir==="left")nx=prev.x-lenMM;
+    else if(lenDir==="down")ny=prev.y+lenMM;
+    else if(lenDir==="up")ny=prev.y-lenMM;
+    setDraft(d=>({pts:[...d.pts,{id:uid(),x:nx,y:ny}]}));
+    setLenInput("");
   }
 
   // ── Point dialog ──────────────────────────────────────────
@@ -1034,6 +1078,22 @@ function App(){
           ))
         )
 
+        , tool==="pfad"&&draft&&draft.pts.length>=1&&React.createElement(React.Fragment, null
+          , React.createElement('div', { style: {display:"flex",alignItems:"center",gap:4,background:"#f0fdf4",border:"2px solid #16a34a",borderRadius:8,padding:"3px 6px"}}
+            , [["left","◄"],["up","▲"],["down","▼"],["right","►"]].map(function(d){
+              return React.createElement('button',{key:d[0],onClick:()=>setLenDir(d[0]),
+                style:{padding:"4px 7px",borderRadius:5,border:"none",background:lenDir===d[0]?"#16a34a":"transparent",color:lenDir===d[0]?"#fff":"#16a34a",fontWeight:900,fontSize:12,cursor:"pointer"}},d[1]);
+            })
+            , React.createElement('input', {type:"number",inputMode:"decimal",value:lenInput,placeholder:"Länge",
+              onChange:e=>setLenInput(e.target.value),
+              onKeyDown:e=>{if(e.key==="Enter")addPointByLength();},
+              style:{width:70,padding:"5px 6px",borderRadius:5,border:"1px solid #16a34a",fontSize:13,fontWeight:700,textAlign:"center"}})
+            , React.createElement('span',{style:{fontSize:11,color:"#16a34a",fontWeight:700}},unit)
+            , React.createElement('button',{onClick:addPointByLength,
+              style:{padding:"5px 9px",borderRadius:5,border:"none",background:"#16a34a",color:"#fff",fontWeight:800,fontSize:12,cursor:"pointer"}},"✓")
+          )
+        )
+
         , tool==="pfad"&&draft&&draft.pts.length>=2&&React.createElement(React.Fragment, null
           , React.createElement('button', { onClick: ()=>finishDraft(true), style: {padding:"8px 14px",borderRadius:7,border:`2px solid ${col}`,background:col,color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 946}}, "Schliessen")
           , React.createElement('button', { onClick: ()=>finishDraft(false), style: {padding:"8px 14px",borderRadius:7,border:"2px solid #16a34a",background:"#16a34a",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 947}}, "Offen")
@@ -1322,6 +1382,27 @@ function App(){
               , React.createElement('button', { onClick: confirmHoleEdit, style: {flex:2,padding:"13px 0",borderRadius:10,background:"#dc2626",color:"#fff",border:"none",fontSize:16,fontWeight:800,cursor:"pointer"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1195}}, "✔ Speichern" )
               , React.createElement('button', { onClick: ()=>deleteHole(dialog.parentId,dialog.holeId), style: {padding:"13px 14px",borderRadius:10,background:"#fef2f2",color:"#dc2626",border:"2px solid #fca5a5",fontSize:14,fontWeight:700,cursor:"pointer"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1196}}, "🗑")
               , React.createElement('button', { onClick: ()=>{setDialog(null);setSelHole(null);}, style: {flex:1,padding:"13px 0",borderRadius:10,background:C.btn,color:C.btnFg,border:`2px solid ${C.border}`,fontSize:14,fontWeight:600,cursor:"pointer"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 1197}}, "X")
+            )
+          )
+        )
+      )
+
+      /* Linien-Länge ändern */
+      , _optionalChain([dialog, 'optionalAccess', _e1 => _e1.type])==="editlen"&&(
+        React.createElement('div', { style: {position:"fixed",inset:0,background:"#00000060",display:"flex",alignItems:"center",justifyContent:"center",zIndex:500}}
+          , React.createElement('div', { style: {background:"#fff",borderRadius:18,padding:22,width:340,boxShadow:"0 20px 60px #0003",border:`1px solid ${C.border}`}}
+            , React.createElement('div', { style: {fontSize:17,fontWeight:900,color:C.dark,marginBottom:6}}, "📏 Länge ändern")
+            , React.createElement('div', { style: {fontSize:13,color:C.mid,marginBottom:14}}, "Aktuelle Länge: ", React.createElement('b',{style:{color:col}},fmt(dialog.len)))
+            , React.createElement('div', { style: {background:"#eff6ff",border:"2px solid #1d4ed8",borderRadius:10,padding:14,marginBottom:16}}
+              , React.createElement('div', { style: {fontSize:12,color:"#1d4ed8",fontWeight:800,marginBottom:8}}, "NEUE LÄNGE ("+uLabel()+")")
+              , React.createElement('input', { type:"number", inputMode:"decimal", autoFocus:true, value:toDisp(dialog.newLen),
+                onChange:e=>setDialog(d=>({...d,newLen:fromDisp(e.target.value)})),
+                onKeyDown:e=>{if(e.key==="Enter")applyNewLength();},
+                style:{width:"100%",padding:12,borderRadius:8,border:"2px solid #1d4ed8",background:"#fff",color:C.dark,fontSize:32,fontWeight:900,textAlign:"center",boxSizing:"border-box"}})
+            )
+            , React.createElement('div', { style: {display:"flex",gap:8}}
+              , React.createElement('button', { onClick: applyNewLength, style: {flex:2,padding:"13px 0",borderRadius:10,background:"#1d4ed8",color:"#fff",border:"none",fontSize:16,fontWeight:900,cursor:"pointer"}}, "✓ Übernehmen")
+              , React.createElement('button', { onClick: ()=>setDialog(null), style: {flex:1,padding:"13px 0",borderRadius:10,background:C.btn,color:C.btnFg,border:`2px solid ${C.border}`,fontSize:15,fontWeight:600,cursor:"pointer"}}, "X")
             )
           )
         )
