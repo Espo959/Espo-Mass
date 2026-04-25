@@ -142,6 +142,7 @@ function App(){
   const [editMode,setEditMode]=useState(false);
   const [showDim,setShowDim]=useState(true);
   const [showPanel,setShowPanel]=useState(true);
+  const [ortho,setOrtho]=useState(true);
   const [unit,setUnit]=useState("mm"); // "mm" | "cm" | "m"
   const [ksList,setKsList]=useState([{id:1,x:0,y:0}]);
   const [activeKS,setActiveKS]=useState(1);
@@ -370,9 +371,29 @@ function App(){
       else{
         if(draft.pts.length>=3){
           const fs=w2s(draft.pts[0].x,draft.pts[0].y,pan,zoom);
-          if(Math.hypot(sx-fs.x,sy-fs.y)<26){finishDraft(true);return;}
+          if(Math.hypot(sx-fs.x,sy-fs.y)<26){
+            // Beim Schliessen: 90°-Eckpunkt automatisch einfügen
+            const first=draft.pts[0];
+            const last=draft.pts[draft.pts.length-1];
+            // Brauchen wir einen Eckpunkt? Nur wenn last NICHT schon orthogonal zu first
+            const dx=Math.abs(last.x-first.x),dy=Math.abs(last.y-first.y);
+            if(dx>1&&dy>1){
+              // Eckpunkt einfügen: x von last, y von first ODER x von first, y von last
+              // Wir wählen den, der die kürzeren Linien ergibt
+              const corner1={id:uid(),x:last.x,y:first.y};
+              const corner2={id:uid(),x:first.x,y:last.y};
+              // Distanzen prüfen
+              const d1=Math.hypot(corner1.x-last.x,corner1.y-last.y)+Math.hypot(corner1.x-first.x,corner1.y-first.y);
+              const d2=Math.hypot(corner2.x-last.x,corner2.y-last.y)+Math.hypot(corner2.x-first.x,corner2.y-first.y);
+              const corner=d1<=d2?corner1:corner2;
+              setDraft(d=>({pts:[...d.pts,corner]}));
+              setTimeout(()=>finishDraft(true),0);
+              return;
+            }
+            finishDraft(true);return;
+          }
         }
-        setDraft(d=>{var prev=d.pts[d.pts.length-1];var nx=wx,ny=wy;if(prev){if(Math.abs(wx-prev.x)>=Math.abs(wy-prev.y)){ny=prev.y;}else{nx=prev.x;}}return{pts:[...d.pts,{id:uid(),x:nx,y:ny}]};});
+        setDraft(d=>{var prev=d.pts[d.pts.length-1];var nx=wx,ny=wy;if(ortho&&prev){if(Math.abs(wx-prev.x)>=Math.abs(wy-prev.y)){ny=prev.y;}else{nx=prev.x;}}return{pts:[...d.pts,{id:uid(),x:nx,y:ny}]};});
       }
     } else if(tool==="ks"){
       pushHist();const nid=uid();
@@ -996,6 +1017,10 @@ function App(){
         )
         , React.createElement('button', { onClick: ()=>setShowDim(d=>!d),
           style: {padding:"8px 14px",borderRadius:7,border:`2px solid ${showDim?"#0891b2":C.border}`,background:showDim?"#0891b2":C.btn,color:showDim?"#fff":C.btnFg,fontWeight:700,fontSize:13,cursor:"pointer"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 930}}, "📐 Mass"
+
+        )
+        , React.createElement('button', { onClick: ()=>setOrtho(o=>!o),
+          style: {padding:"8px 14px",borderRadius:7,border:`2px solid ${ortho?"#16a34a":C.border}`,background:ortho?"#16a34a":C.btn,color:ortho?"#fff":C.btnFg,fontWeight:700,fontSize:13,cursor:"pointer"}}, ortho?"⊾ 90°":"∠ frei"
 
         )
 
